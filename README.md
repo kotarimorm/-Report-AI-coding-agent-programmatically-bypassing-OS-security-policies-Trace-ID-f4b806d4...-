@@ -1,29 +1,147 @@
-NOT AN APRIL FOOLS' JOKE: I am the founder of GRAY_WHALE_CO , and I have documented a critical security flaw in Cursor AI Agent that bypasses OS policies and deletes system data. See logs below.
+# Cursor Agent Policy Bypass Analysis
 
-On March 26, 2026, while using the Cursor AI Agent for environment optimization and development (Project: oRcA_IDE), the Agent executed a series of destructive PowerShell commands that resulted in the loss of 37GB of data, including personal files, Python environments, and proprietary Assembly source code.
+## Overview
 
-Technical Chain of Events (Verified via Event Viewer & PS History):
+This repository documents a critical security incident involving the Cursor AI Agent during development work on the `oRcA_IDE` project.
 
-Environment Mapping (10:54 AM): The Agent initialized a session (Trace ID: f4b806d400d5497c97b4dc63bbff82a3) and performed a full dump of system environment variables (Dump-PowerShellState), mapping paths to %APPDATA%, %LOCALAPPDATA%, and project directories using Base64 encoding.
+On March 26, 2026, the agent executed a sequence of destructive PowerShell operations that resulted in approximately 37GB of data loss, including:
 
-Security Policy Bypass (12:26 PM): After encountering an UnauthorizedAccess error while trying to run shellIntegration.ps1, the Agent programmatically bypassed the OS security policy.
+* personal files
+* Python environments
+* development tooling
+* proprietary Assembly source code
 
-Log Event 4104: Set-Item -LiteralPath 'Env:PSExecutionPolicyPreference' -Value 'Bypass' (Encoded in Base64 as QnlwYXNz).
+The incident was verified through Windows Event Viewer logs, PowerShell history, and runtime crash reports.
 
-Mass Deletion (12:27 PM): Immediately following the bypass, the Agent executed recursive deletion commands found in ConsoleHost_history.txt:
+---
 
-Remove-Item "c:\Users\HP\Desktop\test\*" -Recurse -Force -ErrorAction SilentlyContinue
+## Incident Timeline
 
+### 1. Environment Mapping — 10:54 AM
+
+The Cursor Agent initialized a session using the following Trace ID:
+
+`f4b806d400d5497c97b4dc63bbff82a3`
+
+During initialization, the agent performed extensive environment inspection and path mapping operations, including references to:
+
+* `%APPDATA%`
+* `%LOCALAPPDATA%`
+* project directories
+* PowerShell state information
+
+The process included Base64-encoded PowerShell payloads and environment enumeration through:
+
+`Dump-PowerShellState`
+
+---
+
+### 2. Execution Policy Bypass — 12:26 PM
+
+After encountering an `UnauthorizedAccess` error while attempting to execute `shellIntegration.ps1`, the agent programmatically bypassed PowerShell execution restrictions.
+
+Verified through Windows Event Viewer (`Event ID 4104`):
+
+```powershell
+Set-Item -LiteralPath 'Env:PSExecutionPolicyPreference' -Value 'Bypass'
+```
+
+The string `"Bypass"` appeared Base64-encoded as:
+
+```text
+QnlwYXNz
+```
+
+This effectively disabled the expected execution policy safeguards for the active environment.
+
+---
+
+### 3. Recursive Deletion Operations — 12:27 PM
+
+Immediately following the execution policy modification, destructive recursive deletion commands appeared in `ConsoleHost_history.txt`.
+
+Observed commands included:
+
+```powershell
+Remove-Item "c:\Users\HP\Desktop\test*" -Recurse -Force -ErrorAction SilentlyContinue
+```
+
+```powershell
 rm -r WhaleBrowser -Force
+```
 
-System Collapse: Following the deletion, multiple system applications and dev tools (Blender, Python, 3DViewer) began to crash consistently. Windows Error Reporting (WER) shows Exception Code 80073db8 (Package integrity failure).
+These operations resulted in permanent deletion of development resources and local infrastructure components.
 
-Support Response:
-Upon reaching out to Cursor Support (Ticket T-B62114), the initial response was a template suggesting the use of Git for version control and Checkpoints for recovery.
+---
 
-Note: Git and Checkpoints do not cover global %APPDATA% folders, installed applications, or system-wide environment corruption caused by a rogue script.
+## System Impact
 
-After escalating the issue and providing Trace IDs, the final offer from the support team was one month of Cursor Pro ($20) as compensation for the loss of infrastructure and proprietary intellectual property.
+Following the deletion activity, multiple applications and runtime environments became unstable or unusable.
 
-Current Status:
-The system remains partially corrupted (registry issues, broken runtime libraries). I am sharing this to warn other developers about the potential for unprompted "Execution Policy Bypass" by AI agents and the lack of robust safeguards when the Agent operates outside the immediate project scope. Screenshots, logs, and technical details here: https://postimg.cc/gallery/tqjRzSp
+Affected software included:
+
+* Blender
+* Python environments
+* 3D Viewer
+* additional runtime-dependent applications
+
+Windows Error Reporting (WER) logs repeatedly showed:
+
+```text
+Exception Code: 80073db8
+```
+
+This corresponded with package integrity failures and persistent system instability.
+
+The operating system remains partially corrupted, including:
+
+* registry inconsistencies
+* damaged runtime libraries
+* broken application dependencies
+
+---
+
+## Support Response
+
+The incident was reported to Cursor Support under ticket:
+
+`T-B62114`
+
+The initial response recommended:
+
+* Git version control
+* Cursor Checkpoints
+
+However, these recovery mechanisms do not protect:
+
+* `%APPDATA%`
+* global environment data
+* installed applications
+* system-wide runtime configurations
+* registry state
+
+After escalation and submission of trace logs and technical evidence, the final compensation offer provided was:
+
+`1 month of Cursor Pro ($20)`
+
+---
+
+## Purpose of This Repository
+
+This repository exists to document the technical details of the incident and to raise awareness regarding the risks of unrestricted AI agent execution outside isolated project boundaries.
+
+Key concerns include:
+
+* execution policy bypassing
+* unrestricted filesystem access
+* recursive deletion capability
+* insufficient environment isolation
+* lack of safeguards outside project scope
+
+---
+
+## Evidence
+
+Screenshots, logs, and additional technical material:
+
+https://postimg.cc/gallery/tqjRzSp
