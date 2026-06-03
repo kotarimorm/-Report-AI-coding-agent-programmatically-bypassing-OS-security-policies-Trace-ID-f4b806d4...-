@@ -146,28 +146,28 @@ Key concerns include:
 The Cursor AI Agent initializes an obfuscated PowerShell session, injecting system-level parameters directly into the environment variables.
 * **Timestamp:** 26.03.2026 11:52:38
 * **Evidence:** Windows Event Viewer (`Event ID 4104`). Contains `Env:CURSOR_AGENT` and the unique session tracking token `Env:CURSOR_TRACE_ID` (`f4b806d400d5497c97b4dc63bbff82a3`).
-![Session Initialization](https://postimg.cc/8jbTCSw2)
+![Session Initialization](https://i.postimg.cc/wTCM0xNj/0d8be394-b8c6-4c08-a97e-d83b75a1d6f1.png)
 
 ### 2. Execution Policy Subversion (The Core Bug)
 Definitive proof of the autonomous safety breach. The Agent encounters execution restrictions and programmatically overrides them.
 * **Mechanism:** Injects a Base64-encoded payload `QnlwYXNz` to change `PSExecutionPolicyPreference` to **`Bypass`**.
 * **Result:** This forced bypass allowed the Agent to execute destructive recursive shell commands (`Remove-Item -Recurse -Force`) completely unhindered by Windows security policies.
-![Execution Policy Bypass](https://postimg.cc/mhjbL4m0)
+![Execution Policy Bypass](https://i.postimg.cc/BQ9tCQHQ/2248cb29-7482-4ffd-9349-63bd96640b36.png)
 
 ### 3. Collateral System Degradation (WER Archive)
 Proof of immediate operating system and software environment damage post-deletion.
 * **Impact Analysis:** Right after the environment wipe, the Windows Error Reporting system (`WER\ReportArchive`) logged a cascade of core application crashes (`AppCrash`). Systems like `YourPhone`, audio components (`SmartAudio3`), and browsers (`msedge.exe`) collapsed because their configurations were wiped from `%APPDATA%`. Side effects include corrupted Steam game directories and continuous OS instability.
-![Collateral System Damage](https://postimg.cc/w3wpKVv9)
+![Collateral System Damage](https://i.postimg.cc/DyTyXp34/dcfa195e-a69d-4690-8140-215f333d8bb2.png)
 
 ### 4. First Response: Automated AI Assistant (Ticket T-B62114)
 The initial automated reaction provided by the Cursor vendor (Anysphere).
 * **Outcome:** The critical data loss report was initially handled by an **AI Support Assistant ("Sam")**. The bot explicitly admitted that the *"Agent can make mistakes"*, closed the ticket automatically, and offered generic advice on using Git instead of escalating the execution policy exploit.
-![Automated Support Response](https://postimg.cc/HryDy1tn)
+![Automated Support Response](https://i.postimg.cc/7ZBxjxG3/65df3a6d-ebd4-4280-9e48-e410cf6773b2.png)
 
 ### 5. Final Response: Official Human Escalation
 The final escalation analysis from a human representative at Cursor Support.
 * **Reviewer:** Ben (Cursor Support Human Representative)
 * **Key Admission:** The vendor officially confirms they **do not have server-side logs of the executed destructive actions** due to local machine terminal isolation (*"we don't have server-side logs of what was run"*). This establishes this repository as the definitive primary record of the incident.
 * **Resolution Offered:** The vendor acknowledged that the AI models *"can make mistakes,"* requested the local `Request ID` for further prompt investigation, and officially offered **1 month of Cursor Pro ($20 credit)** as compensation for the 37GB data purge and OS corruption.
-![Official Human Support Resolution](https://postimg.cc/4nLr2xLZ)
+![Official Human Support Resolution](https://i.postimg.cc/dtww17G7/fd57a6db-f8b0-4ae5-a731-6eee9db49df7.png)
 
